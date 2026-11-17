@@ -1,0 +1,24 @@
+{
+ "fails": {
+  "figs": 0,
+  "gpus": 0
+ },
+ "figs_known": [
+  "unisex-modern-classic-scrub-cap:Black",
+  "unisex-modern-classic-scrub-cap:Bonsai",
+  "unisex-modern-classic-scrub-cap:Burgundy",
+  "unisex-modern-classic-scrub-cap:Dark A\u00e7a\u00ed",
+  "unisex-modern-classic-scrub-cap:Graphite",
+  "unisex-modern-classic-scrub-cap:Navy",
+  "unisex-modern-classic-scrub-cap:Quiet Navy",
+  "unisex-modern-classic-scrub-cap:Quiet Navy/Ruby Red",
+  "unisex-modern-classic-scrub-cap:Ruby Red",
+  "unisex-modern-expandable-scrub-cap-scrub-cap:Burgundy",
+  "womens-farida-scrub-cap:Black",
+  "womens-farida-scrub-cap:Espresso",
+  "womens-farida-scrub-cap:Moss",
+  "womens-farida-scrub-cap:Navy"
+ ],
+ "gpu_alerted": {},
+ "gpu_seen": true
+}
