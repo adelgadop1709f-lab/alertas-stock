@@ -57,7 +57,8 @@ def _request(url, data=None, headers=None, tries=3):
         except Exception as e:  # noqa: BLE001
             last = e
             time.sleep(2 * (i + 1))
-    raise RuntimeError(f"fallo al pedir {url}: {last}")
+    shown = url.replace(TOKEN, "***") if TOKEN else url  # nunca mostrar el token
+    raise RuntimeError(f"fallo al pedir {shown}: {last}")
 
 
 def http_text(url, headers=None):
@@ -76,6 +77,21 @@ def send(text):
         f"https://api.telegram.org/bot{TOKEN}/sendMessage",
         data={"chat_id": CHAT_ID, "text": text},
     )
+
+
+def send_photo(photo_url, caption):
+    """Manda foto con texto; si no hay foto o falla, manda solo el texto."""
+    if not TOKEN or not CHAT_ID or not photo_url:
+        return send(caption)
+    try:
+        _request(
+            f"https://api.telegram.org/bot{TOKEN}/sendPhoto",
+            data={"chat_id": CHAT_ID, "photo": photo_url, "caption": caption[:1000]},
+            tries=1,
+        )
+    except Exception as e:  # noqa: BLE001
+        print(f"sendPhoto fallo ({e}); mando solo texto", file=sys.stderr)
+        send(caption)
 
 
 # ----------------------------------------------------------------- GPUs
@@ -123,10 +139,11 @@ def check_gpus(state):
                 msrp = (p.get("metadata") or {}).get("msrp")
                 extra = f" ({price / msrp * 100 - 100:+.0f}% vs MSRP ${msrp})" if msrp else ""
                 store = RETAILERS.get(p.get("retailer"), p.get("retailer"))
-                send(
+                send_photo(
+                    p.get("image_url"),
                     f"🟢 {cls} bajó de ${limit:.2f}\n"
                     f"${price:.2f} en {store}{extra}\n"
-                    f"{p.get('short_name')}\n{p.get('link')}"
+                    f"{p.get('short_name')}\n{p.get('link')}",
                 )
                 alerted[cls] = price
         else:
@@ -154,7 +171,10 @@ def parse_figs(html):
             color = vg.get("color") or {}
             price = (((vg.get("priceRange") or {}).get("min")) or {}).get("amount")
             path = (vg.get("urlPath") or "").replace("/collections/scrub-caps", "", 1)
+            imgs = next((v for k, v in vg.items() if k.startswith("images")), None) or []
+            image = imgs[0].get("url") if imgs and isinstance(imgs[0], dict) else None
             items[f"{handle}:{color.get('id')}"] = {
+                "image": image,
                 "title": vg.get("title"),
                 "color": color.get("displayValue") or color.get("id"),
                 "price": price,
@@ -175,7 +195,10 @@ def check_figs(state):
     if not first_run:
         for v in new.values():
             price = f" · ${v['price']}" if v.get("price") is not None else ""
-            send(f"🧢 Nueva scrub cap en FIGS\n{v['title']} — {v['color']}{price}\n{v['url']}")
+            send_photo(
+                v.get("image"),
+                f"🧢 Nueva scrub cap en FIGS\n{v['title']} — {v['color']}{price}\n{v['url']}",
+            )
     return len(items), first_run
 
 
