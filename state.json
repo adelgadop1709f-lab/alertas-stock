@@ -19,6 +19,8 @@
   "womens-farida-scrub-cap:Moss",
   "womens-farida-scrub-cap:Navy"
  ],
- "gpu_alerted": {},
+ "gpu_alerted": {
+  "RTX 5060 Ti 8GB": 494.0
+ },
  "gpu_seen": true
 }
